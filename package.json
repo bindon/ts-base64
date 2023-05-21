@@ -1,0 +1,29 @@
+{
+  "name": "@bindon/base64",
+  "version": "0.0.1",
+  "description": "base64",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bindon/ts-base64.git"
+  },
+  "keywords": [
+    "base64",
+    "base64url",
+    "nopadding",
+    "typescript",
+    "javascript",
+    "fast",
+    "simple",
+    "light"
+  ],
+  "author": "Wonbin Choi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bindon/ts-base64/issues"
+  },
+  "homepage": "https://github.com/bindon/ts-base64#readme"
+}
