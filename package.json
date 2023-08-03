@@ -1,10 +1,15 @@
 {
   "name": "@bindon/base64",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "base64",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "npm test"
+    "build": "tsc",
+    "pretest": "npm run build",
+    "test": "jest",
+    "prebenchmark": "npm run build",
+    "benchmark": "node dist/benchmark/index.js"
   },
   "repository": {
     "type": "git",
@@ -14,6 +19,7 @@
     "base64",
     "base64url",
     "nopadding",
+    "wrap",
     "typescript",
     "javascript",
     "fast",
@@ -23,7 +29,30 @@
   "author": "Wonbin Choi",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/bindon/ts-base64/issues"
+    "url": "https://github.com/bindon/ts-base64/issues",
+    "email": "bindon@hanmir.com"
   },
-  "homepage": "https://github.com/bindon/ts-base64#readme"
+  "homepage": "https://github.com/bindon/ts-base64#readme",
+  "devDependencies": {
+    "@types/benchmark": "^2.1.2",
+    "@types/emscripten": "^1.39.6",
+    "@types/jest": "^29.5.2",
+    "@typescript-eslint/eslint-plugin": "^5.59.6",
+    "@typescript-eslint/parser": "^5.59.6",
+    "eslint": "^8.41.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-config-standard-with-typescript": "^34.0.1",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.7.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "jest": "^29.5.0",
+    "prettier": "2.8.8",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "benchmark": "^2.1.4"
+  }
 }
