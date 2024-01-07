@@ -1,0 +1,23 @@
+env:
+  browser: true
+  es2021: true
+  node: true
+extends:
+  - prettier
+  - eslint:all
+  - airbnb-base
+  - airbnb-typescript/base
+  - plugin:prettier/recommended
+  - plugin:@typescript-eslint/recommended
+plugins:
+  - prettier
+  - '@typescript-eslint'
+ignorePatterns:
+  - dist
+overrides: []
+parserOptions:
+  ecmaVersion: latest
+  sourceType: module
+  project: tsconfig.json
+rules:
+  prettier/prettier: error
