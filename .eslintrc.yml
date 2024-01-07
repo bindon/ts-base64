@@ -4,13 +4,16 @@ env:
   node: true
 extends:
   - prettier
-  - standard-with-typescript
+  - eslint:all
+  - airbnb-base
+  - airbnb-typescript/base
   - plugin:prettier/recommended
+  - plugin:@typescript-eslint/recommended
 plugins:
   - prettier
+  - '@typescript-eslint'
 ignorePatterns:
   - dist
-  - "src/wasm/base64.js"
 overrides: []
 parserOptions:
   ecmaVersion: latest

@@ -1,12 +1,13 @@
+/* eslint-disable no-bitwise */
+/* eslint-disable no-plusplus */
 export const stringToUint8Array = (data: string): Uint8Array => {
   const codePoints = Array.from(data).map((char) => char.codePointAt(0));
   const uint8Array = new Uint8Array(codePoints.length << 2);
   let offset = 0;
 
-  for (let i = 0; i < codePoints.length; i++) {
-    const codePoint = codePoints[i];
+  codePoints.forEach((codePoint) => {
     if (codePoint === undefined) {
-      continue;
+      return;
     }
 
     if (codePoint <= 0x7f) {
@@ -24,13 +25,13 @@ export const stringToUint8Array = (data: string): Uint8Array => {
       uint8Array[offset++] = 0x80 | ((codePoint >> 6) & 0x3f);
       uint8Array[offset++] = 0x80 | (codePoint & 0x3f);
     }
-  }
+  });
 
   return uint8Array.subarray(0, offset);
 };
 
 export const uint8ArrayToString = (data: Uint8Array): string => {
-  return String.fromCharCode(...data);
+  return new TextDecoder().decode(data);
 };
 
 export const convertToUint8Array = (data: string | ArrayBuffer | Buffer | Uint8Array): Uint8Array => {
@@ -42,25 +43,35 @@ export const convertToUint8Array = (data: string | ArrayBuffer | Buffer | Uint8A
       return new TextEncoder().encode(data);
     }
     return stringToUint8Array(data);
-  } else if (data instanceof ArrayBuffer || data instanceof Buffer) {
-    return new Uint8Array(data);
-  } else if (data instanceof Uint8Array) {
-    return data;
-  } else {
-    throw Error('Unsupported type');
   }
+
+  if (data instanceof ArrayBuffer || data instanceof Buffer) {
+    return new Uint8Array(data);
+  }
+
+  if (data instanceof Uint8Array) {
+    return data;
+  }
+
+  throw Error('Unsupported type');
 };
 
 export const convertToString = (data: string | ArrayBuffer | Buffer | Uint8Array): string => {
   if (typeof data === 'string') {
     return data;
-  } else if (data instanceof ArrayBuffer) {
-    return uint8ArrayToString(new Uint8Array(data));
-  } else if (data instanceof Buffer) {
-    return data.toString();
-  } else if (data instanceof Uint8Array) {
-    return uint8ArrayToString(data);
-  } else {
-    throw Error('Unsupported type');
   }
+
+  if (data instanceof ArrayBuffer) {
+    return uint8ArrayToString(new Uint8Array(data));
+  }
+
+  if (data instanceof Buffer) {
+    return data.toString();
+  }
+
+  if (data instanceof Uint8Array) {
+    return uint8ArrayToString(data);
+  }
+
+  throw Error('Unsupported type');
 };

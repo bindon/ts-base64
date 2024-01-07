@@ -1,4 +1,8 @@
-/** RFC 4648 */
+/**
+ * RFC 4648
+ *
+ * @author bindon
+ * */
 
 import { convertToString, convertToUint8Array } from './util';
 
@@ -13,123 +17,114 @@ const cachedDecodingMap = [
 ];
 const paddingMap = [0, 2, 1];
 
-for (let idx = 0, len = map.length; idx < len; idx++) {
+for (let idx = 0, len = map.length; idx < len; idx += 1) {
   const code = map.charCodeAt(idx);
   cachedNormalEncodingMap[idx] = code;
   cachedUrlEncodingMap[idx] = code;
   cachedDecodingMap[code] = idx;
 }
 
-cachedNormalEncodingMap[62] = 43; // '+'
-cachedNormalEncodingMap[63] = 47; // '/'
-cachedUrlEncodingMap[62] = 45; // '-'
-cachedUrlEncodingMap[63] = 95; // '_'
-cachedDecodingMap[43] = cachedDecodingMap[45] = 62;
-cachedDecodingMap[47] = cachedDecodingMap[95] = 63;
-let debug = '[';
-for (let idx=0; idx<cachedDecodingMap.length; idx++) {
-  debug += `${cachedDecodingMap[idx]}, `;
-}
+cachedNormalEncodingMap[62] = 43; // Base64:62('+') > ASCII:43('+')
+cachedNormalEncodingMap[63] = 47; // Base64:63('/') > ASCII:47('/')
+cachedUrlEncodingMap[62] = 45; // Base64:62('-') > ASCII:45('-')
+cachedUrlEncodingMap[63] = 95; // Base64:63('_') > ASCII:95('_')
+cachedDecodingMap[43] = 62; // ASCII:43('+')
+cachedDecodingMap[45] = 62; // ASCII:45('-')
+cachedDecodingMap[47] = 63; // ASCII:47('/')
+cachedDecodingMap[95] = 63; // ASCII:95('_')
 
-debug += ']';
-console.log(debug);
-
-interface Base64Options {
-  urlSafe: boolean;
-  padding: boolean;
-}
-
+/* eslint-disable no-bitwise */
 const encode = (data: string | ArrayBuffer | Uint8Array, options?: Base64Options): string => {
   const plaintext = convertToUint8Array(data);
-  const expectedLength = Math.ceil(plaintext.byteLength * (4 / 3));
+  let expectedLength = Math.ceil((plaintext.byteLength * 4) / 3);
 
-  let ciphertextLength = expectedLength;
-  let map = cachedUrlEncodingMap;
+  const isRequiredPadding = options?.urlSafe === false && options?.padding;
+  const cachedMap = options?.urlSafe === false ? cachedNormalEncodingMap : cachedUrlEncodingMap;
 
-  if (options?.padding === true) {
-    ciphertextLength += paddingMap[plaintext.byteLength % 3];
-    map = cachedNormalEncodingMap;
+  if (isRequiredPadding) {
+    expectedLength += paddingMap[plaintext.byteLength % 3];
   }
 
-  const ciphertext = new Uint8Array(ciphertextLength);
-
-  if (options?.padding === true) {
-    ciphertext[ciphertextLength - 1] = 61;
-    ciphertext[ciphertextLength - 2] = 61;
+  const ciphertext = new Uint8Array(expectedLength);
+  if (isRequiredPadding) {
+    ciphertext[expectedLength - 1] = 61; // '='
+    ciphertext[expectedLength - 2] = 61; // '='
   }
 
   let plainIdx = 0;
   let cipherIdx = 0;
 
   while (plainIdx + 3 < plaintext.byteLength) {
-    ciphertext[cipherIdx] = map[plaintext[plainIdx] >> 2];
-    ciphertext[cipherIdx + 1] = map[((plaintext[plainIdx] << 4) | (plaintext[plainIdx + 1] >> 4)) & 0x3f];
-    ciphertext[cipherIdx + 2] = map[((plaintext[plainIdx + 1] << 2) | (plaintext[plainIdx + 2] >> 6)) & 0x3f];
-    ciphertext[cipherIdx + 3] = map[plaintext[plainIdx + 2] & 0x3f];
+    ciphertext[cipherIdx] = cachedMap[plaintext[plainIdx] >> 2];
+    ciphertext[cipherIdx + 1] = cachedMap[((plaintext[plainIdx] << 4) | (plaintext[plainIdx + 1] >> 4)) & 0x3f];
+    ciphertext[cipherIdx + 2] = cachedMap[((plaintext[plainIdx + 1] << 2) | (plaintext[plainIdx + 2] >> 6)) & 0x3f];
+    ciphertext[cipherIdx + 3] = cachedMap[plaintext[plainIdx + 2] & 0x3f];
     plainIdx += 3;
     cipherIdx += 4;
   }
 
-  ciphertext[cipherIdx] = map[plaintext[plainIdx] >> 2];
-  ciphertext[cipherIdx + 1] = map[((plaintext[plainIdx] << 4) | (plaintext[plainIdx + 1] >> 4)) & 0x3f];
+  ciphertext[cipherIdx] = cachedMap[plaintext[plainIdx] >> 2];
+  ciphertext[cipherIdx + 1] = cachedMap[((plaintext[plainIdx] << 4) | (plaintext[plainIdx + 1] >> 4)) & 0x3f];
   if (plainIdx + 1 < plaintext.byteLength) {
-    ciphertext[cipherIdx + 2] = map[((plaintext[plainIdx + 1] << 2) | (plaintext[plainIdx + 2] >> 6)) & 0x3f];
+    ciphertext[cipherIdx + 2] = cachedMap[((plaintext[plainIdx + 1] << 2) | (plaintext[plainIdx + 2] >> 6)) & 0x3f];
   }
   if (plainIdx + 2 < plaintext.byteLength) {
-    ciphertext[cipherIdx + 3] = map[plaintext[plainIdx + 2] & 0x3f];
+    ciphertext[cipherIdx + 3] = cachedMap[plaintext[plainIdx + 2] & 0x3f];
   }
 
   return new TextDecoder().decode(ciphertext);
 };
 
+/* eslint-disable no-bitwise */
 const decode = (data: string): Uint8Array => {
-  var tmp
-  var lens = getLens(b64)
-  var validLen = lens[0]
-  var placeHoldersLen = lens[1]
+  const ciphertext = convertToUint8Array(data);
 
-  var arr = new Arr(_byteLength(b64, validLen, placeHoldersLen))
+  const expectedLength = Math.ceil(data.length / 4) * 3;
+  const plaintext = new Uint8Array(expectedLength);
 
-  var curByte = 0
+  let cipherIdx = 0;
+  let plainIdx = 0;
 
-  // if there are placeholders, only get up to the last complete 4 chars
-  var len = placeHoldersLen > 0
-    ? validLen - 4
-    : validLen
-
-  var i
-  for (i = 0; i < len; i += 4) {
-    tmp =
-      (revLookup[b64.charCodeAt(i)] << 18) |
-      (revLookup[b64.charCodeAt(i + 1)] << 12) |
-      (revLookup[b64.charCodeAt(i + 2)] << 6) |
-      revLookup[b64.charCodeAt(i + 3)]
-    arr[curByte++] = (tmp >> 16) & 0xFF
-    arr[curByte++] = (tmp >> 8) & 0xFF
-    arr[curByte++] = tmp & 0xFF
+  while (cipherIdx + 4 < ciphertext.byteLength) {
+    plaintext[plainIdx] =
+      (cachedDecodingMap[ciphertext[cipherIdx]] << 2) | (cachedDecodingMap[ciphertext[cipherIdx + 1]] >> 4);
+    plaintext[plainIdx + 1] =
+      (cachedDecodingMap[ciphertext[cipherIdx + 1]] << 4) | (cachedDecodingMap[ciphertext[cipherIdx + 2]] >> 2);
+    plaintext[plainIdx + 2] =
+      (cachedDecodingMap[ciphertext[cipherIdx + 2]] << 6) | cachedDecodingMap[ciphertext[cipherIdx + 3]];
+    plainIdx += 3;
+    cipherIdx += 4;
   }
 
-  if (placeHoldersLen === 2) {
-    tmp =
-      (revLookup[b64.charCodeAt(i)] << 2) |
-      (revLookup[b64.charCodeAt(i + 1)] >> 4)
-    arr[curByte++] = tmp & 0xFF
+  plaintext[plainIdx] =
+    (cachedDecodingMap[ciphertext[cipherIdx]] << 2) | (cachedDecodingMap[ciphertext[cipherIdx + 1]] >> 4);
+
+  if (plaintext[plainIdx]) {
+    plainIdx += 1;
+    plaintext[plainIdx] =
+      (cachedDecodingMap[ciphertext[cipherIdx + 1]] << 4) | (cachedDecodingMap[ciphertext[cipherIdx + 2]] >> 2);
   }
 
-  if (placeHoldersLen === 1) {
-    tmp =
-      (revLookup[b64.charCodeAt(i)] << 10) |
-      (revLookup[b64.charCodeAt(i + 1)] << 4) |
-      (revLookup[b64.charCodeAt(i + 2)] >> 2)
-    arr[curByte++] = (tmp >> 8) & 0xFF
-    arr[curByte++] = tmp & 0xFF
+  if (plaintext[plainIdx]) {
+    plainIdx += 1;
+    plaintext[plainIdx] =
+      (cachedDecodingMap[ciphertext[cipherIdx + 2]] << 6) | cachedDecodingMap[ciphertext[cipherIdx + 3]];
   }
 
-  return arr
+  if (plaintext[plainIdx]) {
+    plainIdx += 1;
+  }
+
+  return plaintext.subarray(0, plainIdx);
 };
 
 const decodeToString = (data: string): string => {
   return convertToString(decode(data));
 };
 
-export { encode, decode, decodeToString };
+interface Base64Options {
+  urlSafe: boolean;
+  padding: boolean;
+}
+
+export { Base64Options, encode, decode, decodeToString };
