@@ -1,5 +1,5 @@
-import { encode, decode, decodeToString } from '../src';
 import { convertToString, stringToUint8Array } from '../src/util';
+import Base64 from '../src';
 
 const plaintext = {
   emoji: '🙌😂👍🎉😍🔥✨💯😏✌️',
@@ -14,45 +14,45 @@ const plainTextUint8Array = {
 
 describe('encode', () => {
   test('empty string', () => {
-    expect(encode('')).toBe('');
+    expect(Base64.encode('')).toBe('');
   });
 
   test(`${plaintext.emoji} - normal(padding)`, () => {
-    expect(encode(plaintext.emoji, { urlSafe: false, padding: true })).toBe(
+    expect(Base64.encode(plaintext.emoji, { padding: true, urlSafe: false })).toBe(
       '8J+ZjPCfmILwn5GN8J+OifCfmI3wn5Sl4pyo8J+Sr/CfmI/inIzvuI8=',
     );
   });
 
   test(`${plaintext.emoji} - normal(no-padding)`, () => {
-    expect(encode(plaintext.emoji, { urlSafe: false, padding: false })).toBe(
+    expect(Base64.encode(plaintext.emoji, { padding: false, urlSafe: false })).toBe(
       '8J+ZjPCfmILwn5GN8J+OifCfmI3wn5Sl4pyo8J+Sr/CfmI/inIzvuI8',
     );
   });
 
   test(`${plaintext.emoji} - url safe`, () => {
-    expect(encode(plaintext.emoji)).toBe('8J-ZjPCfmILwn5GN8J-OifCfmI3wn5Sl4pyo8J-Sr_CfmI_inIzvuI8');
+    expect(Base64.encode(plaintext.emoji)).toBe('8J-ZjPCfmILwn5GN8J-OifCfmI3wn5Sl4pyo8J-Sr_CfmI_inIzvuI8');
   });
 });
 
 describe('decode', () => {
   test('empty string', () => {
-    expect(decode('')).toStrictEqual(stringToUint8Array(''));
+    expect(Base64.decode('')).toStrictEqual(stringToUint8Array(''));
   });
 
   test(`${plaintext.emoji} - normal(padding)`, () => {
-    expect(decode('8J+ZjPCfmILwn5GN8J+OifCfmI3wn5Sl4pyo8J+Sr/CfmI/inIzvuI8=')).toStrictEqual(
+    expect(Base64.decode('8J+ZjPCfmILwn5GN8J+OifCfmI3wn5Sl4pyo8J+Sr/CfmI/inIzvuI8=')).toStrictEqual(
       stringToUint8Array(plaintext.emoji),
     );
   });
 
   test(`${plaintext.emoji} - normal(no-padding)`, () => {
-    expect(decode('8J+ZjPCfmILwn5GN8J+OifCfmI3wn5Sl4pyo8J+Sr/CfmI/inIzvuI8')).toStrictEqual(
+    expect(Base64.decode('8J+ZjPCfmILwn5GN8J+OifCfmI3wn5Sl4pyo8J+Sr/CfmI/inIzvuI8')).toStrictEqual(
       stringToUint8Array(plaintext.emoji),
     );
   });
 
   test(`${plaintext.emoji} - url safe`, () => {
-    expect(decode('8J-ZjPCfmILwn5GN8J-OifCfmI3wn5Sl4pyo8J-Sr_CfmI_inIzvuI8')).toStrictEqual(
+    expect(Base64.decode('8J-ZjPCfmILwn5GN8J-OifCfmI3wn5Sl4pyo8J-Sr_CfmI_inIzvuI8')).toStrictEqual(
       stringToUint8Array(plaintext.emoji),
     );
   });
@@ -60,19 +60,19 @@ describe('decode', () => {
 
 describe('decodeToString', () => {
   test('empty string', () => {
-    expect(decodeToString('')).toBe('');
+    expect(Base64.decodeToString('')).toBe('');
   });
 
   test(`${plaintext.emoji} - normal(padding)`, () => {
-    expect(decodeToString('8J+ZjPCfmILwn5GN8J+OifCfmI3wn5Sl4pyo8J+Sr/CfmI/inIzvuI8=')).toBe(plaintext.emoji);
+    expect(Base64.decodeToString('8J+ZjPCfmILwn5GN8J+OifCfmI3wn5Sl4pyo8J+Sr/CfmI/inIzvuI8=')).toBe(plaintext.emoji);
   });
 
   test(`${plaintext.emoji} - normal(no-padding)`, () => {
-    expect(decodeToString('8J+ZjPCfmILwn5GN8J+OifCfmI3wn5Sl4pyo8J+Sr/CfmI/inIzvuI8')).toBe(plaintext.emoji);
+    expect(Base64.decodeToString('8J+ZjPCfmILwn5GN8J+OifCfmI3wn5Sl4pyo8J+Sr/CfmI/inIzvuI8')).toBe(plaintext.emoji);
   });
 
   test(`${plaintext.emoji} - url safe`, () => {
-    expect(decodeToString('8J-ZjPCfmILwn5GN8J-OifCfmI3wn5Sl4pyo8J-Sr_CfmI_inIzvuI8')).toBe(plaintext.emoji);
+    expect(Base64.decodeToString('8J-ZjPCfmILwn5GN8J-OifCfmI3wn5Sl4pyo8J-Sr_CfmI_inIzvuI8')).toBe(plaintext.emoji);
   });
 });
 

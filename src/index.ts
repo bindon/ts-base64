@@ -1,10 +1,17 @@
+/* eslint-disable max-statements */
+/* eslint-disable no-bitwise */
 /**
  * RFC 4648
  *
  * @author bindon
- * */
+ */
 
 import { convertToString, convertToUint8Array } from './util';
+
+export interface Base64Options {
+  urlSafe: boolean;
+  padding: boolean;
+}
 
 const map = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 const cachedNormalEncodingMap = new Array<number>(64);
@@ -24,22 +31,33 @@ for (let idx = 0, len = map.length; idx < len; idx += 1) {
   cachedDecodingMap[code] = idx;
 }
 
-cachedNormalEncodingMap[62] = 43; // Base64:62('+') > ASCII:43('+')
-cachedNormalEncodingMap[63] = 47; // Base64:63('/') > ASCII:47('/')
-cachedUrlEncodingMap[62] = 45; // Base64:62('-') > ASCII:45('-')
-cachedUrlEncodingMap[63] = 95; // Base64:63('_') > ASCII:95('_')
-cachedDecodingMap[43] = 62; // ASCII:43('+')
-cachedDecodingMap[45] = 62; // ASCII:45('-')
-cachedDecodingMap[47] = 63; // ASCII:47('/')
-cachedDecodingMap[95] = 63; // ASCII:95('_')
+// Base64:62('+') > ASCII:43('+')
+cachedNormalEncodingMap[62] = 43;
+// Base64:63('/') > ASCII:47('/')
+cachedNormalEncodingMap[63] = 47;
+// Base64:62('-') > ASCII:45('-')
+cachedUrlEncodingMap[62] = 45;
+// Base64:63('_') > ASCII:95('_')
+cachedUrlEncodingMap[63] = 95;
+// ASCII:43('+')
+cachedDecodingMap[43] = 62;
+// ASCII:45('-')
+cachedDecodingMap[45] = 62;
+// ASCII:47('/')
+cachedDecodingMap[47] = 63;
+// ASCII:95('_')
+cachedDecodingMap[95] = 63;
 
-/* eslint-disable no-bitwise */
 const encode = (data: string | ArrayBuffer | Uint8Array, options?: Base64Options): string => {
   const plaintext = convertToUint8Array(data);
   let expectedLength = Math.ceil((plaintext.byteLength * 4) / 3);
 
   const isRequiredPadding = options?.urlSafe === false && options?.padding;
-  const cachedMap = options?.urlSafe === false ? cachedNormalEncodingMap : cachedUrlEncodingMap;
+  let cachedMap = cachedUrlEncodingMap;
+
+  if (options?.urlSafe === false) {
+    cachedMap = cachedNormalEncodingMap;
+  }
 
   if (isRequiredPadding) {
     expectedLength += paddingMap[plaintext.byteLength % 3];
@@ -47,8 +65,9 @@ const encode = (data: string | ArrayBuffer | Uint8Array, options?: Base64Options
 
   const ciphertext = new Uint8Array(expectedLength);
   if (isRequiredPadding) {
-    ciphertext[expectedLength - 1] = 61; // '='
-    ciphertext[expectedLength - 2] = 61; // '='
+    // 61 === '='
+    ciphertext[expectedLength - 1] = 61;
+    ciphertext[expectedLength - 2] = 61;
   }
 
   let plainIdx = 0;
@@ -75,7 +94,6 @@ const encode = (data: string | ArrayBuffer | Uint8Array, options?: Base64Options
   return new TextDecoder().decode(ciphertext);
 };
 
-/* eslint-disable no-bitwise */
 const decode = (data: string): Uint8Array => {
   const ciphertext = convertToUint8Array(data);
 
@@ -122,9 +140,10 @@ const decodeToString = (data: string): string => {
   return convertToString(decode(data));
 };
 
-interface Base64Options {
-  urlSafe: boolean;
-  padding: boolean;
-}
+const Base64 = {
+  decode,
+  decodeToString,
+  encode,
+};
 
-export { Base64Options, encode, decode, decodeToString };
+export default Base64;
