@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 /* eslint-disable no-bitwise */
 /* eslint-disable no-plusplus */
 export const stringToUint8Array = (data: string): Uint8Array => {
@@ -6,7 +7,7 @@ export const stringToUint8Array = (data: string): Uint8Array => {
   let offset = 0;
 
   codePoints.forEach((codePoint) => {
-    if (codePoint === undefined) {
+    if (!codePoint) {
       return;
     }
 
