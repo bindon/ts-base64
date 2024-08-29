@@ -1,5 +1,5 @@
 # @bindon/base64
-Fast and Simple Base64 Library
+A fast and simple base64 library for typescript
 
 ## Install
 ```shell
