@@ -48,7 +48,7 @@ const convertToUint8Array = (data) => {
         }
         return (0, exports.stringToUint8Array)(data);
     }
-    if (data instanceof ArrayBuffer || data instanceof Buffer) {
+    if (data instanceof ArrayBuffer || (typeof Buffer === 'function' && data instanceof Buffer)) {
         return new Uint8Array(data);
     }
     if (data instanceof Uint8Array) {
@@ -64,7 +64,7 @@ const convertToString = (data) => {
     if (data instanceof ArrayBuffer) {
         return (0, exports.uint8ArrayToString)(new Uint8Array(data));
     }
-    if (data instanceof Buffer) {
+    if (typeof Buffer === 'function' && data instanceof Buffer) {
         return data.toString();
     }
     if (data instanceof Uint8Array) {
