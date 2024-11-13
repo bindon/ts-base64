@@ -93,20 +93,23 @@ const decode = (data) => {
         plainIdx += 3;
         cipherIdx += 4;
     }
-    plaintext[plainIdx] =
-        (cachedDecodingMap[ciphertext[cipherIdx]] << 2) | (cachedDecodingMap[ciphertext[cipherIdx + 1]] >> 4);
-    if (plaintext[plainIdx]) {
-        plainIdx += 1;
+    if (ciphertext[cipherIdx] && ciphertext[cipherIdx + 1]) {
         plaintext[plainIdx] =
-            (cachedDecodingMap[ciphertext[cipherIdx + 1]] << 4) | (cachedDecodingMap[ciphertext[cipherIdx + 2]] >> 2);
-    }
-    if (plaintext[plainIdx]) {
+            (cachedDecodingMap[ciphertext[cipherIdx]] << 2) | (cachedDecodingMap[ciphertext[cipherIdx + 1]] >> 4);
         plainIdx += 1;
+        cipherIdx += 1;
+    }
+    if (ciphertext[cipherIdx] && ciphertext[cipherIdx + 1] && ciphertext[cipherIdx + 1] !== 61) {
         plaintext[plainIdx] =
-            (cachedDecodingMap[ciphertext[cipherIdx + 2]] << 6) | cachedDecodingMap[ciphertext[cipherIdx + 3]];
-    }
-    if (plaintext[plainIdx]) {
+            (cachedDecodingMap[ciphertext[cipherIdx]] << 4) | (cachedDecodingMap[ciphertext[cipherIdx + 1]] >> 2);
         plainIdx += 1;
+        cipherIdx += 1;
+    }
+    if (ciphertext[cipherIdx] && ciphertext[cipherIdx + 1] && ciphertext[cipherIdx + 1] !== 61) {
+        plaintext[plainIdx] =
+            (cachedDecodingMap[ciphertext[cipherIdx]] << 6) | cachedDecodingMap[ciphertext[cipherIdx + 1]];
+        plainIdx += 1;
+        cipherIdx += 1;
     }
     return plaintext.subarray(0, plainIdx);
 };
