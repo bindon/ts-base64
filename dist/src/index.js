@@ -79,7 +79,7 @@ const encode = (data, options) => {
 };
 const decode = (data) => {
     const ciphertext = (0, util_1.convertToUint8Array)(data);
-    const expectedLength = Math.ceil(data.length / 4) * 3;
+    const expectedLength = Math.floor(data.length * 3) / 4;
     const plaintext = new Uint8Array(expectedLength);
     let cipherIdx = 0;
     let plainIdx = 0;
@@ -111,7 +111,7 @@ const decode = (data) => {
         plainIdx += 1;
         cipherIdx += 1;
     }
-    return plaintext.subarray(0, plainIdx);
+    return plaintext;
 };
 const decodeToString = (data) => {
     return (0, util_1.convertToString)(decode(data));

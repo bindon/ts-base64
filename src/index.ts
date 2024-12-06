@@ -97,7 +97,7 @@ const encode = (data: string | ArrayBuffer | Uint8Array, options?: Base64Options
 const decode = (data: string): Uint8Array => {
   const ciphertext = convertToUint8Array(data);
 
-  const expectedLength = Math.ceil(data.length / 4) * 3;
+  const expectedLength = Math.floor(data.length * 3) / 4;
   const plaintext = new Uint8Array(expectedLength);
 
   let cipherIdx = 0;
@@ -135,7 +135,7 @@ const decode = (data: string): Uint8Array => {
     cipherIdx += 1;
   }
 
-  return plaintext.subarray(0, plainIdx);
+  return plaintext;
 };
 
 const decodeToString = (data: string): string => {
