@@ -1,4 +1,3 @@
-import { convertToString, stringToUint8Array } from '../src/util';
 import Base64 from '../src';
 
 const plaintext = {
@@ -36,24 +35,24 @@ describe('encode', () => {
 
 describe('decode', () => {
   test('empty string', () => {
-    expect(Base64.decode('')).toStrictEqual(stringToUint8Array(''));
+    expect(Base64.decode('')).toStrictEqual(new Uint8Array());
   });
 
   test(`${plaintext.emoji} - normal(padding)`, () => {
     expect(Base64.decode('8J+ZjPCfmILwn5GN8J+OifCfmI3wn5Sl4pyo8J+Sr/CfmI/inIzvuI8=')).toStrictEqual(
-      stringToUint8Array(plaintext.emoji),
+      plainTextUint8Array.emoji,
     );
   });
 
   test(`${plaintext.emoji} - normal(no-padding)`, () => {
     expect(Base64.decode('8J+ZjPCfmILwn5GN8J+OifCfmI3wn5Sl4pyo8J+Sr/CfmI/inIzvuI8')).toStrictEqual(
-      stringToUint8Array(plaintext.emoji),
+      plainTextUint8Array.emoji,
     );
   });
 
   test(`${plaintext.emoji} - url safe`, () => {
     expect(Base64.decode('8J-ZjPCfmILwn5GN8J-OifCfmI3wn5Sl4pyo8J-Sr_CfmI_inIzvuI8')).toStrictEqual(
-      stringToUint8Array(plaintext.emoji),
+      plainTextUint8Array.emoji,
     );
   });
 });
@@ -73,31 +72,5 @@ describe('decodeToString', () => {
 
   test(`${plaintext.emoji} - url safe`, () => {
     expect(Base64.decodeToString('8J-ZjPCfmILwn5GN8J-OifCfmI3wn5Sl4pyo8J-Sr_CfmI_inIzvuI8')).toBe(plaintext.emoji);
-  });
-});
-
-describe('utility', () => {
-  describe('convert string to uint8array', () => {
-    test('Buffer', () => {
-      expect(new Uint8Array(Buffer.from(plaintext.emoji))).toStrictEqual(plainTextUint8Array.emoji);
-    });
-    test('TextEncoder', () => {
-      expect(new TextEncoder().encode(plaintext.emoji)).toStrictEqual(plainTextUint8Array.emoji);
-    });
-    test('Pure', () => {
-      expect(stringToUint8Array(plaintext.emoji)).toStrictEqual(plainTextUint8Array.emoji);
-    });
-  });
-
-  describe('convert to string', () => {
-    test('Buffer', () => {
-      expect(convertToString(Buffer.from(plaintext.emoji))).toBe(plaintext.emoji);
-    });
-    test('TextEncoder', () => {
-      expect(convertToString(new TextEncoder().encode(plaintext.emoji))).toBe(plaintext.emoji);
-    });
-    test('Pure', () => {
-      expect(convertToString(stringToUint8Array(plaintext.emoji))).toBe(plaintext.emoji);
-    });
   });
 });

@@ -1,13 +1,8 @@
 "use strict";
-/* eslint-disable max-statements */
 /* eslint-disable no-bitwise */
-/**
- * RFC 4648
- *
- * @author bindon
- */
+/* eslint-disable no-plusplus */
+/* eslint-disable max-statements */
 Object.defineProperty(exports, "__esModule", { value: true });
-const util_1 = require("./util");
 const map = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 const cachedNormalEncodingMap = new Array(64);
 const cachedUrlEncodingMap = new Array(64);
@@ -40,8 +35,67 @@ cachedDecodingMap[45] = 62;
 cachedDecodingMap[47] = 63;
 // ASCII:95('_')
 cachedDecodingMap[95] = 63;
+const stringToUint8Array = (data) => {
+    const codePoints = Array.from(data).map((char) => char.codePointAt(0));
+    const uint8Array = new Uint8Array(codePoints.length << 2);
+    let offset = 0;
+    codePoints.forEach((codePoint) => {
+        if (!codePoint) {
+            return;
+        }
+        if (codePoint <= 0x7f) {
+            uint8Array[offset++] = codePoint;
+        }
+        else if (codePoint <= 0x7ff) {
+            uint8Array[offset++] = 0xc0 | (codePoint >> 6);
+            uint8Array[offset++] = 0x80 | (codePoint & 0x3f);
+        }
+        else if (codePoint <= 0xffff) {
+            uint8Array[offset++] = 0xe0 | (codePoint >> 12);
+            uint8Array[offset++] = 0x80 | ((codePoint >> 6) & 0x3f);
+            uint8Array[offset++] = 0x80 | (codePoint & 0x3f);
+        }
+        else {
+            uint8Array[offset++] = 0xf0 | (codePoint >> 18);
+            uint8Array[offset++] = 0x80 | ((codePoint >> 12) & 0x3f);
+            uint8Array[offset++] = 0x80 | ((codePoint >> 6) & 0x3f);
+            uint8Array[offset++] = 0x80 | (codePoint & 0x3f);
+        }
+    });
+    return uint8Array.subarray(0, offset);
+};
+const uint8ArrayToString = (data) => {
+    return new TextDecoder().decode(data);
+};
+const convertToUint8Array = (data) => {
+    if (typeof data === 'string') {
+        if (typeof TextEncoder === 'function') {
+            return new TextEncoder().encode(data);
+        }
+        return stringToUint8Array(data);
+    }
+    if (data instanceof ArrayBuffer) {
+        return new Uint8Array(data);
+    }
+    if (data instanceof Uint8Array) {
+        return data;
+    }
+    throw Error('Unsupported type');
+};
+const convertToString = (data) => {
+    if (typeof data === 'string') {
+        return data;
+    }
+    if (data instanceof ArrayBuffer) {
+        return uint8ArrayToString(new Uint8Array(data));
+    }
+    if (data instanceof Uint8Array) {
+        return uint8ArrayToString(data);
+    }
+    throw Error('Unsupported type');
+};
 const encode = (data, options) => {
-    const plaintext = (0, util_1.convertToUint8Array)(data);
+    const plaintext = convertToUint8Array(data);
     let expectedLength = Math.ceil((plaintext.byteLength * 4) / 3);
     const isRequiredPadding = options?.urlSafe === false && options?.padding;
     let cachedMap = cachedUrlEncodingMap;
@@ -78,8 +132,8 @@ const encode = (data, options) => {
     return new TextDecoder().decode(ciphertext);
 };
 const decode = (data) => {
-    const ciphertext = (0, util_1.convertToUint8Array)(data);
-    const expectedLength = Math.floor(data.length * 3) / 4;
+    const ciphertext = convertToUint8Array(data);
+    const expectedLength = Math.floor(ciphertext.byteLength * 3) / 4;
     const plaintext = new Uint8Array(expectedLength);
     let cipherIdx = 0;
     let plainIdx = 0;
@@ -109,12 +163,14 @@ const decode = (data) => {
         plaintext[plainIdx] =
             (cachedDecodingMap[ciphertext[cipherIdx]] << 6) | cachedDecodingMap[ciphertext[cipherIdx + 1]];
         plainIdx += 1;
-        cipherIdx += 1;
+    }
+    if (expectedLength !== plainIdx) {
+        return new Uint8Array(plaintext.subarray(0, plainIdx));
     }
     return plaintext;
 };
 const decodeToString = (data) => {
-    return (0, util_1.convertToString)(decode(data));
+    return convertToString(decode(data));
 };
 const Base64 = {
     decode,
