@@ -1,6 +1,6 @@
 {
   "name": "@bindon/base64",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "A fast and simple base64 library for typescript",
   "main": "src/index.js",
   "types": "src/index.d.ts",
