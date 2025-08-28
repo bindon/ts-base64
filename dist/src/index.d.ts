@@ -8,7 +8,7 @@ export interface Base64Options {
     padding: boolean;
 }
 declare const Base64: {
-    decode: (data: string) => Uint8Array;
+    decode: (data: string) => Uint8Array<ArrayBuffer>;
     decodeToString: (data: string) => string;
     encode: (data: string | ArrayBuffer | Uint8Array, options?: Base64Options) => string;
 };
