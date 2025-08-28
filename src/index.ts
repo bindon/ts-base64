@@ -48,7 +48,7 @@ cachedDecodingMap[47] = 63;
 // ASCII:95('_')
 cachedDecodingMap[95] = 63;
 
-const stringToUint8Array = (data: string): Uint8Array => {
+const stringToUint8Array = (data: string): Uint8Array<ArrayBuffer> => {
   const codePoints = Array.from(data).map((char) => char.codePointAt(0));
   const uint8Array = new Uint8Array(codePoints.length << 2);
   let offset = 0;
@@ -163,7 +163,7 @@ const encode = (data: string | ArrayBuffer | Uint8Array, options?: Base64Options
   return new TextDecoder().decode(ciphertext);
 };
 
-const decode = (data: string): Uint8Array => {
+const decode = (data: string): Uint8Array<ArrayBuffer> => {
   const ciphertext = convertToUint8Array(data);
   const expectedLength = Math.floor(ciphertext.byteLength * 3) / 4;
   const plaintext = new Uint8Array(expectedLength);
