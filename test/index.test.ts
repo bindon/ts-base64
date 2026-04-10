@@ -35,7 +35,7 @@ describe('encode', () => {
 
 describe('decode', () => {
   test('empty string', () => {
-    expect(Base64.decode('')).toStrictEqual(new Uint8Array());
+    expect(Base64.decode('')).toStrictEqual(new Uint8Array(0));
   });
 
   test(`${plaintext.emoji} - normal(padding)`, () => {
