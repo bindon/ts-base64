@@ -1,6 +1,6 @@
 {
   "name": "@bindon/base64",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A fast and simple base64 library for typescript",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
