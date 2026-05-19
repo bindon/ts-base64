@@ -1,41 +1,29 @@
-import { FlatCompat } from '@eslint/eslintrc';
 import eslint from '@eslint/js';
 import eslintConfigPrettier from 'eslint-config-prettier';
-import eslintPluginPrettier from 'eslint-plugin-prettier';
-import { fileURLToPath } from 'node:url';
 import globals from 'globals';
-import path from 'node:path';
-import typescriptEslint from 'typescript-eslint';
+import tseslint from 'typescript-eslint';
 
-const filename = fileURLToPath(import.meta.url);
-const dirname = path.dirname(filename);
-const compat = new FlatCompat({
-  allConfig: eslint.configs.all,
-  baseDirectory: dirname,
-  recommendedConfig: eslint.configs.recommended,
-});
-
-export default typescriptEslint.config(
-  eslint.configs.all,
-  ...typescriptEslint.configs.recommended,
-  ...compat.extends('plugin:prettier/recommended', 'prettier'),
+export default tseslint.config(
   {
-    ignores: ['**/dist', '**/node_modules'],
+    ignores: [
+      '**/dist',
+      '**/node_modules',
+      'eslint.config.mjs',
+      'jest.config.ts',
+      'benchmark/**',
+      'test/**',
+    ],
   },
+  eslint.configs.all,
+  tseslint.configs.strictTypeChecked,
   {
     languageOptions: {
-      globals: {
-        ...globals.browser,
-        ...globals.node,
+      globals: { ...globals.browser, ...globals.node },
+      parserOptions: {
+        project: ['./tsconfig.esm.json'],
+        tsconfigRootDir: import.meta.dirname,
       },
-      parser: typescriptEslint.parser,
     },
-
-    plugins: {
-      prettier: eslintPluginPrettier,
-      'typescript-eslint': typescriptEslint.plugin,
-    },
-
     rules: {
       'no-magic-numbers': 'off',
       'one-var': 'off',

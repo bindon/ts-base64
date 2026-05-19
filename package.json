@@ -20,6 +20,7 @@
   "scripts": {
     "prebuild": "rm -rf dist",
     "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json",
+    "lint": "eslint .",
     "pretest": "npm run build",
     "test": "jest",
     "prebenchmark": "npm run build",
@@ -55,19 +56,20 @@
     "access": "public"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/benchmark": "^2.1.5",
     "@types/jest": "^30.0.0",
-    "@typescript-eslint/eslint-plugin": "^8.58.1",
-    "@typescript-eslint/parser": "^8.58.1",
+    "@typescript-eslint/eslint-plugin": "^8.59.4",
+    "@typescript-eslint/parser": "^8.59.4",
     "@vue/tsconfig": "^0.9.1",
-    "eslint": "^10.2.0",
+    "eslint": "^10.4.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.5",
-    "jest": "^30.3.0",
-    "prettier": "^3.8.2",
+    "globals": "^17.6.0",
+    "jest": "^30.4.2",
+    "prettier": "^3.8.3",
     "ts-jest": "^29.4.9",
     "ts-node": "^10.9.2",
-    "typescript": "^6.0.2",
-    "typescript-eslint": "^8.58.1"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.4"
   }
 }

@@ -121,7 +121,7 @@ const encode = (data: string | ArrayBuffer | Uint8Array, options?: Base64Options
   const plaintext = convertToUint8Array(data);
   let expectedLength = Math.ceil((plaintext.byteLength * 4) / 3);
 
-  const isRequiredPadding = options?.urlSafe === false && options?.padding;
+  const isRequiredPadding = options?.urlSafe === false && options.padding;
   let cachedMap = cachedUrlEncodingMap;
 
   if (options?.urlSafe === false) {
