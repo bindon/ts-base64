@@ -78,9 +78,7 @@ const stringToUint8Array = (data: string): Uint8Array<ArrayBuffer> => {
   return uint8Array.subarray(0, offset);
 };
 
-const uint8ArrayToString = (data: Uint8Array): string => {
-  return new TextDecoder().decode(data);
-};
+const uint8ArrayToString = (data: Uint8Array): string => new TextDecoder().decode(data);
 
 const convertToUint8Array = (data: string | ArrayBuffer | Uint8Array): Uint8Array => {
   if (typeof data === 'string') {
@@ -209,9 +207,7 @@ const decode = (data: string): Uint8Array<ArrayBuffer> => {
   return plaintext;
 };
 
-const decodeToString = (data: string): string => {
-  return convertToString(decode(data));
-};
+const decodeToString = (data: string): string => convertToString(decode(data));
 
 const Base64 = {
   decode,

@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import Base64 from '../src';
 
 const plaintext = {
